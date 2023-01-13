@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const ownerSchema = mongoose.Schema({
+const tenantSchema = mongoose.Schema({
     firstName: {
         type: String,
         required: [true, 'Please add a first name']
@@ -17,9 +17,21 @@ const ownerSchema = mongoose.Schema({
     password: {
         type: String,
         required: [true, 'Please add a password']
-    }
+    },
+    age: {
+        type: String,
+        // required: [true, 'Please add an email'],
+    },
+    jobTitle: {
+        type: String,
+        // required: [true, 'Please add an email'],
+    },
+    salary: {
+        type: String,
+        // required: [true, 'Please add an email'],
+    },
 },{
     timestamps: true
 })
 
-module.exports = mongoose.model('Owner', ownerSchema);
+module.exports = mongoose.model('Tenant', tenantSchema);
