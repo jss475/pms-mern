@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "@fontsource/urbanist": "^4.5.16"
+  },
+  "name": "pms-hanawilo",
+  "version": "1.0.0",
+  "description": "PMS server",
+  "main": "index.js",
+  "scripts": {
+ 
+  },
+  "author": "Joseph Shin",
+  "license": "ISC"
+}
