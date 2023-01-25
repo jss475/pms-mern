@@ -6,9 +6,10 @@
   "version": "1.0.0",
   "description": "PMS server",
   "main": "index.js",
-  "scripts": {
- 
-  },
+  "scripts": {},
   "author": "Joseph Shin",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
 }

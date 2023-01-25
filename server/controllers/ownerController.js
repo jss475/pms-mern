@@ -26,25 +26,32 @@ const registerOwner = asyncHandler(async (req,res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    //Create owner
-    const owner = await Owner.create({
-        firstName,
-        lastName,
-        email,
-        password: hashedPassword
-    })
-    
-    if(owner){
-        res.status(201).json({
-            _id: owner.id,
-            firstName: owner.firstName,
-            lastName: owner.lastName,
-            email: owner.email,
-            token: generateToken(owner._id)
+    //we add the try catch to that if async call fails to the DB to create the owner,
+    //we get an error
+    try{
+        //Create owner
+        const owner = await Owner.create({
+            firstName,
+            lastName,
+            email,
+            password: hashedPassword
         })
-    }else{
+        
+        if(owner){
+            res.status(201).json({
+                _id: owner.id,
+                firstName: owner.firstName,
+                lastName: owner.lastName,
+                email: owner.email,
+                token: generateToken(owner._id)
+            })
+        }else{
+            res.status(400)
+            throw new Error('Invalid owner data ')
+        }
+    }catch(e){
         res.status(400)
-        throw new Error('Invalid owner data ')
+        throw new Error('Error saving to the db', e.message)
     }
 })
 
@@ -54,20 +61,26 @@ const registerOwner = asyncHandler(async (req,res) => {
 const loginOwner = asyncHandler(async (req,res) => {
     const {email, password} = req.body;
 
-    //Check for owner email
-    const owner = await Owner.findOne({email})
+    //error finding in database
+    try {
+        //Check for owner email
+        const owner = await Owner.findOne({email})
 
-    if(owner && (await bcrypt.compare(password,owner.password))){
-        res.json({
-            _id: owner.id,
-            firstName: owner.firstName,
-            lastName: owner.lastName,
-            email: owner.email,
-            token: generateToken(owner._id)
-        })
-    }else{
+        if(owner && (await bcrypt.compare(password,owner.password))){
+            res.json({
+                _id: owner.id,
+                firstName: owner.firstName,
+                lastName: owner.lastName,
+                email: owner.email,
+                token: generateToken(owner._id)
+            })
+        }else{
+            res.status(400)
+            throw new Error('Invalid credentials')
+        }
+    }catch(e){
         res.status(400)
-        throw new Error('Invalid credentials')
+        throw new Error('Error finding owner in the db', e.message)
     }
 })
 
@@ -75,13 +88,19 @@ const loginOwner = asyncHandler(async (req,res) => {
 //@route GET /owners/me
 //@access Private
 const getOwner = asyncHandler(async (req,res) => {
-    const {_id, name, email} = await Owner.findById(req.owner.id)
+    //this try catch is for not being able to call to the DB
+    try {
+        const {_id, name, email} = await Owner.findById(req.owner.id)
 
-    res.status(200).json({
-        id: _id,
-        name,
-        email
-    })
+        res.status(200).json({
+            id: _id,
+            name,
+            email
+        })
+    }catch(e){
+        res.status(400)
+        throw new Error('Error finding owner in the db', e.message)
+    }
 })
 
 

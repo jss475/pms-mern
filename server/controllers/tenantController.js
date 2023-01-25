@@ -27,26 +27,32 @@ const registerTenant = asyncHandler(async (req,res) => {
     //Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt)
-
-    //Create tenant
-    const tenant = await Tenant.create({
-        firstName,
-        lastName,
-        email,
-        password: hashedPassword
-    })
-    
-    if(tenant){
-        res.status(201).json({
-            _id: tenant._id,
-            firstName: tenant.firstName,
-            lastName: tenant.lastName,
-            email: tenant.email,
-            token: generateToken(tenant._id)
+    //we add the try catch to that if async call fails to the DB to create the tenant,
+    //we get an error
+    try {
+        //Create tenant
+        const tenant = await Tenant.create({
+            firstName,
+            lastName,
+            email,
+            password: hashedPassword
         })
-    }else{
+        
+        if(tenant){
+            res.status(201).json({
+                _id: tenant._id,
+                firstName: tenant.firstName,
+                lastName: tenant.lastName,
+                email: tenant.email,
+                token: generateToken(tenant._id)
+            })
+        }else{
+            res.status(400)
+            throw new Error('Invalid owner data')
+        }
+    }catch(e){
         res.status(400)
-        throw new Error('Invalid owner data')
+        throw new Error('Error saving to the db', e.message)
     }
 })
 
@@ -57,21 +63,27 @@ const registerTenant = asyncHandler(async (req,res) => {
 const loginTenant = asyncHandler(async (req, res) => {
     const {email, password} = req.body;
 
-    //Check for tenant email
-    const tenant = await Tenant.findOne({email})
+    //error finding in database
+    try {
+        //Check for tenant email
+        const tenant = await Tenant.findOne({email})
 
-    //check if the tenant exists and the password is correct
-    if(tenant && (await bcrypt.compare(password,tenant.password))){
-        res.json({
-            _id: tenant.id,
-            firstName: tenant.firstName,
-            lastName: tenant.lastName,
-            email: tenant.email,
-            token: generateToken(tenant._id)
-        })
-    }else{
+        //check if the tenant exists and the password is correct
+        if(tenant && (await bcrypt.compare(password,tenant.password))){
+            res.json({
+                _id: tenant.id,
+                firstName: tenant.firstName,
+                lastName: tenant.lastName,
+                email: tenant.email,
+                token: generateToken(tenant._id)
+            })
+        }else{
+            res.status(400)
+            throw new Error('Invalid credentials')
+        }
+    }catch(e){
         res.status(400)
-        throw new Error('Invalid credentials')
+        throw new Error('Error finding tenant in the db', e.message)
     }
 })
 
@@ -79,13 +91,19 @@ const loginTenant = asyncHandler(async (req, res) => {
 //@route GET /tenants/me
 //@access Private
 const getTenant = asyncHandler(async (req,res) => {
-    const {_id, name, email} = await Tenant.findById(req.tenant.id)
+    //this try catch is for not being able to call to the DB
+    try {
+        const {_id, name, email} = await Tenant.findById(req.tenant.id)
 
-    res.status(200).json({
-        id: _id,
-        name,
-        email
-    })
+        res.status(200).json({
+            id: _id,
+            name,
+            email
+        })
+    }catch(e) {
+        res.status(400)
+        throw new Error('Error finding tenant in the db', e.message)
+    }
 })
 
 //Generate JWT

@@ -9,12 +9,19 @@ connectDB()
 
 const app = express();
 
+//create route variables
+const ownerRouter = './routes/ownerRoutes'
+const tenantRouter = './routes/tenantRoutes'
+const propertyRouter = './routes/propertyRoutes'
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 
-app.use('/owners', require('./routes/ownerRoutes'));
-app.use('/tenants', require('./routes/tenantRoutes'));
+app.use('/owners', require(ownerRouter));
+app.use('/tenants', require(tenantRouter));
+app.use('/properties', require(propertyRouter));
 
 app.use(errorHandler);
 
