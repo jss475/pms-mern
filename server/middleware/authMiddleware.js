@@ -35,13 +35,12 @@ const protectTenant = asyncHandler(async (req,res,next) => {
         try{
             //Get token from header
             token = req.headers.authorization.split(' ')[1]
-
             //Verify token
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
             //Get tenant from the token
             req.tenant = await Tenant.findById(decoded.id).select('-password')
-
+            
             next()
         }catch (error) {
             console.log(error)

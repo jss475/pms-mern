@@ -1,21 +1,23 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const propertyTenantSchema = new Schema({
+const leaseSchema = new Schema({
     property: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Property'
     },
-    tenants: [{
+    tenant: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Tenant'
-    }],
+    },
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Owner'
+    },
+    ownerAgree: {
+        type: Boolean,
+        default: false
     }
-}, {
-    timestamps: true
-});
+})
 
-module.exports = mongoose.model('PropertyTenant', propertyTenantSchema);
+module.exports = mongoose.model('Lease', leaseSchema);

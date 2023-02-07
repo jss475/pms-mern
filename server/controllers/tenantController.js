@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const asyncHandler = require('express-async-handler');
 const Tenant = require('../models/tenantModel');
+const Lease = require('../models/leaseModel');
 
 //@desc Register new tenant
 //@route POST /tenants/signup
@@ -93,17 +94,37 @@ const loginTenant = asyncHandler(async (req, res) => {
 const getTenant = asyncHandler(async (req,res) => {
     //this try catch is for not being able to call to the DB
     try {
-        const {_id, name, email} = await Tenant.findById(req.tenant.id)
-
+        const {_id, firstName, lastName, email} = await Tenant.findById(req.tenant.id)
+        const lease = await Lease.find({tenant: _id})
         res.status(200).json({
             id: _id,
-            name,
-            email
+            firstName,
+            lastName,
+            email,
+            lease
         })
     }catch(e) {
         res.status(400)
         throw new Error('Error finding tenant in the db', e.message)
     }
+})
+
+//@desc Logout the tenant
+//@route POST /tenants/logout
+//@access Private
+const logoutTenant = asyncHandler(async (req, res, next) => {
+    try{
+        res.cookie('token', 'none', {
+            expires: new Date(Date.now() + 10 * 1000), 
+            httpOnly: true
+        })
+    
+        res.status(200).json({ success: true })
+    }catch(e){
+        res.status(400)
+        throw new Error('Error logging out');
+    }
+
 })
 
 //Generate JWT
@@ -116,5 +137,6 @@ const generateToken = (id) => {
 module.exports = {
     registerTenant,
     loginTenant,
-    getTenant
+    getTenant,
+    logoutTenant
 }
