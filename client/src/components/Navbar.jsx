@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { styled, alpha, useTheme } from '@mui/material/styles';
 import { useSelector, useDispatch } from "react-redux";
 import { removeToken } from "../features/jwt_token/jwtTokenSlice";
-import { openModal, URLModal } from "react-url-modal"
+// import { openModal, URLModal } from "react-url-modal"
 import CssBaseline from '@mui/material/CssBaseline';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -359,7 +359,7 @@ function Navbar() {
                                                     }}
                                                 >
                                                     <MenuItem to="/tenants/login" state={{ background: location }} onClick={handleClickOpenTenantLogin}>Login</MenuItem>
-                                                    <URLModal
+                                                    {/* <URLModal
                                                         modals={{
                                                             test: testLogin
                                                         }}
@@ -368,7 +368,7 @@ function Navbar() {
                                                         name: 'test',
                                                     })}>
                                                         Open
-                                                    </button>
+                                                    </button> */}
                                                     
                                                     <MenuItem onClick={handleClickOpenTenantSignUp}>Sign Up</MenuItem>
                                                     <TenantSignup openSignUp={openTenantSignUp} setOpenSignUp={setOpenTenantSignUp} openLogin={openTenantLogin} setOpenLogin={setOpenTenantLogin}/>
